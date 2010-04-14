@@ -33,8 +33,8 @@ card_stream:
   password: Y
   
 cyber_source:
-  login: X
-  password: Y
+  login: cybs11113128
+  password: hce2xWhYV3tXgvLKYlji+GoicQghbgwM47OzDX0dxEt7uJtfXbOpAkAo0Ed0wPWQTR81WdBrSKPvu3bKE3yrJwg3a2zw+30RZ9qKtLd9tr+CTC1TNcaVQZ5pzn7RKRuw0kOhspQhkfwi0UEAjpNShVS1Ex0GkEi5/+7C0nG659URaae6PTYxLU+RQ8sxvAQuHh1xCCFuDAzjs7MNfR3ES3u4m19ds6kCQCjQR3TA9ZBNHzVZ0GtIo++7dsoTfKsnCDdrbPD7fRFn2oq0t322v4JMLVM1xpVBnmnOftEpG7DSQ6GylCGR/CLRQQCOk1KFVLUTHQaQSLn/7sLScbrn1Q==
 
 data_cash:
   login: X
@@ -198,22 +198,6 @@ psl_visa_address:
   address2: 
   address3: 
   city: 
-  zip:
-    
-psl_visa_debit:
-  first_name:
-  last_name:
-  number:
-  month:
-  year:
-  verification_value:
-
-psl_visa_debit_address:
-  address1:
-  address2:
-  address3:
-  city:
-  state:
   zip:
 
 quickpay:
