@@ -104,10 +104,15 @@ module ActiveMerchant #:nodoc:
       # Request an authorization for an amount from CyberSource 
       #
       # You must supply an :order_id in the options hash 
-      def authorize(money, creditcard, options = {})
+      def authorize(money, payment_source, options = {})
         requires!(options,  :order_id, :email)
         setup_address_hash(options)
-        commit(build_auth_request(money, creditcard, options), options )
+        if payment_source.is_a?(String)
+          requires!(options, [:type, :credit_card, :check])
+          commit(build_subscription_auth_request(money, payment_source, options), options)
+        else
+          commit(build_auth_request(money, payment_source, options), options)
+        end
       end
 
       # Capture an authorization that has previously been requested
@@ -188,11 +193,11 @@ module ActiveMerchant #:nodoc:
         options[:shipping_address] = options[:shipping_address] || {}
       end
       
-      def build_auth_request(money, creditcard, options)
+      def build_auth_request(money, payment_source, options)
         xml = Builder::XmlMarkup.new :indent => 2
         add_address(xml, options[:billing_address], options)
         add_purchase_data(xml, money, true, options)
-        add_creditcard(xml, creditcard)
+        add_payment_source(xml, payment_source)
         add_auth_service(xml)
         add_business_rules_data(xml)
         xml.target!
@@ -296,6 +301,19 @@ module ActiveMerchant #:nodoc:
           when :check         then add_check_service(xml)
         end
 
+        add_business_rules_data(xml)
+        xml.target!
+      end
+
+      def build_subscription_auth_request(money, identification, options)
+        reference_code, subscription_id, request_token = identification.split(";")
+        options[:subscription] ||= {}
+        options[:subscription][:subscription_id] = subscription_id
+      
+        xml = Builder::XmlMarkup.new :indent => 2
+        add_purchase_data(xml, money, true, options)
+        add_subscription(xml, options)
+        add_auth_service(xml)
         add_business_rules_data(xml)
         xml.target!
       end
