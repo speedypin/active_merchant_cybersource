@@ -526,11 +526,7 @@ module ActiveMerchant #:nodoc:
 
       def commit(request, options)
         request = build_request(request, options)
-        puts "REQUEST: "
-        puts request
-        puts "RESPONSE: "
         response = ssl_post(test? ? TEST_URL : LIVE_URL, request)
-        puts response
 	      response = parse(response)
 
 	      success = response[:decision] == "ACCEPT"
