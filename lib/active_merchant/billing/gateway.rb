@@ -104,7 +104,7 @@ module ActiveMerchant #:nodoc:
       end
       
       def self.card_brand(source)
-        result = source.respond_to?(:brand) ? source.brand : source.type
+        result = source.respond_to?(:brand) ? source.brand : source.instance_variable_get( "@type" )
         result.to_s.downcase
       end
     
