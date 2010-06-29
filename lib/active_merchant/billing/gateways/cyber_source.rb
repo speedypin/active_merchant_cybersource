@@ -156,6 +156,16 @@ module ActiveMerchant #:nodoc:
         commit(build_update_subscription_request(identification, options), options)
       end
 
+      def retrieve_subscription(subscription_id, options = {})
+        requires!(options, :order_id)
+        commit(build_retrieve_subscription_request(subscription_id, options), options)
+      end
+
+      def delete_subscription(subscription_id, options = {})
+        requires!(options, :order_id)
+        commit(build_delete_subscription_request(subscription_id, options), options)
+      end
+
       # CyberSource requires that you provide line item information for tax calculations
       # If you do not have prices for each item or want to simplify the situation then pass in one fake line item that costs the subtotal of the order
       #
@@ -318,6 +328,26 @@ module ActiveMerchant #:nodoc:
         xml.target!
       end
 
+      def build_retrieve_subscription_request(subscription_id, options)
+        options[:subscription] ||= {}
+        options[:subscription][:subscription_id] = subscription_id
+      
+        xml = Builder::XmlMarkup.new :indent => 2
+        add_subscription(xml, options)
+        add_subscription_retrieve_service(xml, options)
+        xml.target!
+      end
+      
+      def build_delete_subscription_request(subscription_id, options)
+        options[:subscription] ||= {}
+        options[:subscription][:subscription_id] = subscription_id
+      
+        xml = Builder::XmlMarkup.new :indent => 2
+        add_subscription(xml, options)
+        add_subscription_delete_service(xml, options)
+        xml.target!
+      end
+
       def add_business_rules_data(xml)
         xml.tag! 'businessRules' do
           xml.tag!('ignoreAVSResult', 'true') if @options[:ignore_avs]
@@ -464,6 +494,14 @@ module ActiveMerchant #:nodoc:
         xml.tag! 'paySubscriptionUpdateService', {'run' => 'true'}
       end
 
+      def add_subscription_retrieve_service(xml, options)
+        xml.tag! 'paySubscriptionRetrieveService', {'run' => 'true'}
+      end
+      
+      def add_subscription_delete_service(xml, options)
+        xml.tag! 'paySubscriptionDeleteService', {'run' => 'true'}
+      end
+
       def add_subscription(xml, options, payment_source=nil)
         if payment_source
           xml.tag! 'subscription' do
@@ -500,7 +538,7 @@ module ActiveMerchant #:nodoc:
               end
             end
             xml.tag! 's:Body', {'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance', 'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema'} do
-              xml.tag! 'requestMessage', {'xmlns' => 'urn:schemas-cybersource-com:transaction-data-1.32'} do
+              xml.tag! 'requestMessage', {'xmlns' => 'urn:schemas-cybersource-com:transaction-data-1.51'} do
                 add_merchant_data(xml, options)
                 xml << body
               end
@@ -510,20 +548,6 @@ module ActiveMerchant #:nodoc:
       end
       
       # Contact CyberSource, make the SOAP request, and parse the reply into a Response object
-      def commit(request, options)
-	      response = parse(ssl_post(test? ? TEST_URL : LIVE_URL, build_request(request, options)))
-	      success = response[:decision] == "ACCEPT"
-	      message = @@response_codes[('r' + response[:reasonCode]).to_sym] rescue response[:message] 
-        authorization = success ? [ options[:order_id], response[:requestID], response[:requestToken] ].compact.join(";") : nil
-        
-        Response.new(success, message, response, 
-          :test => test?, 
-          :authorization => authorization,
-          :avs_result => { :code => response[:avsCode] },
-          :cvv_result => response[:cvCode]
-        )
-      end
-
       def commit(request, options)
         request = build_request(request, options)
         response = ssl_post(test? ? TEST_URL : LIVE_URL, request)

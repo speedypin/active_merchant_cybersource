@@ -193,7 +193,7 @@ class RemoteCyberSourceTest < Test::Unit::TestCase
     assert response.test?
   end
 
-  def test_successful_create_subscription_with_cc
+  def test_successful_create ggg_with_cc
     assert response = @gateway.create_subscription(@credit_card, @subscription_options)
     assert_equal 'Successful transaction', response.message
     assert_success response
@@ -226,6 +226,39 @@ class RemoteCyberSourceTest < Test::Unit::TestCase
     assert response.test?
   end
 
+  def test_successful_retrieve_subscription
+    assert response = @gateway.create_subscription(@credit_card, @subscription_options)
+    assert_equal 'Successful transaction', response.message
+    assert_success response
+    assert response.test?
+  
+    assert response = @gateway.retrieve_subscription(response.params['subscriptionID'], {:order_id => generate_unique_id})
+    assert_equal 'Successful transaction', response.message
+    assert_success response
+    assert response.test?
+    assert_equal "411111XXXXXX1111", response.params["cardAccountNumber"]
+  end
+  
+  def test_successful_delete_subscription
+    # Create the subscription
+    assert create_response = @gateway.create_subscription(@credit_card, @subscription_options)
+    assert_equal 'Successful transaction', create_response.message
+    assert_success create_response
+    assert create_response.test?
+  
+    # Delete it
+    delete_response = @gateway.delete_subscription(create_response.params['subscriptionID'], {:order_id => generate_unique_id})
+    assert_equal 'Successful transaction', delete_response.message
+    assert_success delete_response
+    assert delete_response.test?
+  
+    # Now you can't retrieve it
+    assert retrieve_response = @gateway.retrieve_subscription(create_response.params['subscriptionID'], {:order_id => generate_unique_id})
+    assert_equal 'One or more fields contains invalid data', retrieve_response.message
+    assert_failure retrieve_response
+    assert retrieve_response.test?
+  end
+  
   def test_successful_purchase_with_cc_subscription
     assert response = @gateway.create_subscription(@credit_card, @subscription_options)
     assert_equal 'Successful transaction', response.message
