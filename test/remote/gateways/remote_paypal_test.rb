@@ -11,7 +11,7 @@ class PaypalTest < Test::Unit::TestCase
       :number              => "4381258770269608", # Use a generated CC from the paypal Sandbox
       :verification_value => "000",
       :month               => 1,
-      :year                => Time.now.year + 1,
+      :year                => 2011,
       :first_name          => 'Fred',
       :last_name           => 'Brooks'
     )
@@ -34,7 +34,7 @@ class PaypalTest < Test::Unit::TestCase
       # :name => # if not spec'd, the name on card will be used
       # :profile_id => 'I-SEVK234C8U1M', # triggers :modify on recurring
       :email => 'joe.customer@vuzit.com',
-      :starting_at => Time.now + 1.month,
+      :starting_at => '2011-04-02T07:00:00.00000',
       :periodicity => :monthly,
       :comment => 'CHANGEME',
       :billing_address => address,
@@ -209,9 +209,9 @@ class PaypalTest < Test::Unit::TestCase
   end
   
   def test_create_recurring_profile_with_invalid_date
-    response = @gateway.recurring(1000, @creditcard, @recurring_params.merge(:starting_at => Time.now))
+    response = @gateway.recurring(1000, @creditcard, @recurring_params.merge(:starting_at => '2009-04-02T07:00:00.00000'))
     assert_failure response
-    assert_equal 'Field format error: Start or next payment date must be a valid future date', response.message
+    assert_equal 'Subscription start date should be greater than current date', response.message
     assert response.params['profile_id'].blank?
     assert response.test?
   end
@@ -229,49 +229,34 @@ class PaypalTest < Test::Unit::TestCase
   
   def test_full_feature_set_for_recurring_profiles
     # Test add
-    @recurring_params.merge(
-      :periodicity => :weekly,
-      :payments => '12',
-      :starting_at => Time.now + 1.day,
-      :comment => "Test Profile"
-    )
-    response = @gateway.recurring(100, @creditcard, @recurring_params)
-    assert_equal "Approved", response.params['message']
-    assert_equal "0", response.params['result']
+    response = @gateway.recurring(1000, @creditcard, @recurring_params)
+    assert_equal "Success", response.message
     assert_success response
     assert response.test?
     assert !response.params['profile_id'].blank?
     @recurring_profile_id = response.params['profile_id']
   
     # Test modify
-    @recurring_params.merge(
-      :periodicity => :monthly,
-      :starting_at => Time.now + 1.day,
-      :payments => '4',
-      :profile_id => @recurring_profile_id
-    )
-    response = @gateway.recurring(400, @credit_card, @recurring_params)
-    assert_equal "Approved", response.params['message']
-    assert_equal "0", response.params['result']
+    response = @gateway.recurring(400, @creditcard, @recurring_params)
+    assert_equal "Success", response.message
     assert_success response
     assert response.test?
     
     # Test inquiry
     response = @gateway.recurring_inquiry(@recurring_profile_id) 
-    assert_equal "0", response.params['result']
+    assert_equal "Success", response.message
     assert_success response
     assert response.test?
     
     # Test payment history inquiry
     response = @gateway.recurring_inquiry(@recurring_profile_id, :history => true)
-    assert_equal '0', response.params['result']
+    assert_equal "Success", response.message
     assert_success response
     assert response.test?
     
     # Test cancel
     response = @gateway.cancel_recurring(@recurring_profile_id)
-    assert_equal "Approved", response.params['message']
-    assert_equal "0", response.params['result']
+    assert_equal "Success", response.message
     assert_success response
     assert response.test?
   end
