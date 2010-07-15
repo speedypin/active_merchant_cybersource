@@ -173,11 +173,9 @@ module ActiveMerchant #:nodoc:
                   xml.tag! ns2 + 'Description', options[:comment]
 
                   unless options[:initial_payment].nil?
-                    xml.tag! ns2 + 'TrialPeriod' do
-                      xml.tag! ns2 + 'BillingPeriod', 'Month'
-                      xml.tag! ns2 + 'BillingFrequency', 1
-                      xml.tag! ns2 + 'TotalBillingCycles', 1
-                      xml.tag! ns2 + 'Amount', amount(options[:initial_payment]), 'currencyID' => options[:currency] || currency(options[:initial_payment])
+                    xml.tag! ns2 + 'ActivationDetails' do
+                      xml.tag! ns2 + 'InitialAmount', amount(options[:initial_payment]), 'currencyID' => options[:currency] || currency(options[:initial_payment])
+                      xml.tag! ns2 + 'FailedInitAmountAction', 'CancelOnFailure'
                     end
                   end
 
