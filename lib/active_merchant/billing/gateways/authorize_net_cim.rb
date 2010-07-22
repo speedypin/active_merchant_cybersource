@@ -645,6 +645,7 @@ module ActiveMerchant #:nodoc:
         )
         
         response.params['direct_response'] = parse_direct_response(response) if response.params['direct_response']
+
         response
       end
       
