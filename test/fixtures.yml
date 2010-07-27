@@ -11,8 +11,8 @@
 # Paste any required PEM certificates after the pem key.  
 #
 authorize_net:
-  login: X
-  password: Y
+  login: 6Dss8UJ88
+  password: 73jCa83Z5Zz2T4K9
 
 beanstream:
   login: merchant id
