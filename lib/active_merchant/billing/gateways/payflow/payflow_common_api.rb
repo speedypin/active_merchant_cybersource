@@ -4,14 +4,16 @@ module ActiveMerchant #:nodoc:
       def self.included(base)
         base.default_currency = 'USD'
           
-        base.class_inheritable_accessor :partner
+        # base.class_inheritable_accessor :partner
+        base.class_attribute :partner
         
         # Set the default partner to PayPal
         base.partner = 'PayPal'
         
         base.supported_countries = ['US', 'CA', 'SG', 'AU']
         
-        base.class_inheritable_accessor :timeout
+        # base.class_inheritable_accessor :timeout
+        base.class_attribute :timeout
         base.timeout = 60
         
         # Enable safe retry of failed connections
@@ -182,24 +184,24 @@ module ActiveMerchant #:nodoc:
         {
           "Content-Type" => "text/xml",
           "Content-Length" => content_length.to_s,
-      	  "X-VPS-Client-Timeout" => timeout.to_s,
-      	  "X-VPS-VIT-Integration-Product" => "ActiveMerchant",
-      	  "X-VPS-VIT-Runtime-Version" => RUBY_VERSION,
-      	  "X-VPS-Request-ID" => Utils.generate_unique_id
-    	  }
-    	end
-    	
-    	def commit(request_body, request_type = nil)
+          "X-VPS-Client-Timeout" => timeout.to_s,
+          "X-VPS-VIT-Integration-Product" => "ActiveMerchant",
+          "X-VPS-VIT-Runtime-Version" => RUBY_VERSION,
+          "X-VPS-Request-ID" => Utils.generate_unique_id
+          }
+        end
+        
+        def commit(request_body, request_type = nil)
         request = build_request(request_body, request_type)
         headers = build_headers(request.size)
         
-    	  response = parse(ssl_post(test? ? TEST_URL : LIVE_URL, request, headers))
+          response = parse(ssl_post(test? ? TEST_URL : LIVE_URL, request, headers))
 
-    	  build_response(response[:result] == "0", response[:message], response,
-    	    :test => test?,
-    	    :authorization => response[:pn_ref] || response[:rp_ref],
-    	    :cvv_result => CVV_CODE[response[:cv_result]],
-    	    :avs_result => { :code => response[:avs_result] }
+          build_response(response[:result] == "0", response[:message], response,
+            :test => test?,
+            :authorization => response[:pn_ref] || response[:rp_ref],
+            :cvv_result => CVV_CODE[response[:cv_result]],
+            :avs_result => { :code => response[:avs_result] }
         )
       end
     end

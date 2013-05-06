@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 module ActiveMerchant #:nodoc:
   module Billing #:nodoc:
     # ==== Customer Information Manager (CIM)
@@ -27,7 +28,8 @@ module ActiveMerchant #:nodoc:
     # 5. Click Submit
     class AuthorizeNetCimGateway < Gateway
     
-      class_inheritable_accessor :test_url, :live_url
+      # class_inheritable_accessor :test_url, :live_url
+      class_attribute :test_url, :live_url
 
       self.test_url = 'https://apitest.authorize.net/xml/v1/request.api'
       self.live_url = 'https://api.authorize.net/xml/v1/request.api'

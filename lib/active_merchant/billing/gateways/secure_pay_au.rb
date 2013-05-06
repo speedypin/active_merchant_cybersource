@@ -17,7 +17,8 @@ module ActiveMerchant #:nodoc:
       # The name of the gateway
       self.display_name = 'SecurePay'
       
-      class_inheritable_accessor :request_timeout
+      # class_inheritable_accessor :request_timeout
+      class_attribute :request_timeout
       self.request_timeout = 60
       
       self.money_format = :cents
