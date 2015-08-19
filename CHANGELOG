@@ -1,5 +1,8 @@
 = ActiveMerchant CHANGELOG
 
+== Version 1.5.12.1
+
+* Updated the cacert.pem to an up-to-date one. [khaidl]
 * Add JCB and Diners Club to LinkPoint [Soleone]
 
 == Version 1.5.1 (February 14, 2010)
