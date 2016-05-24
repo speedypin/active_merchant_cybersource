@@ -2,21 +2,31 @@ module ActiveMerchant #:nodoc:
   module PostsData  #:nodoc:
 
     def self.included(base)
-      base.superclass_delegating_accessor :ssl_strict
+      # Deprecated in Rails 4.2
+      # base.superclass_delegating_accessor :ssl_strict
+      base.class_attribute :ssl_strict
       base.ssl_strict = true
       
       # base.class_inheritable_accessor :retry_safe
       base.class_attribute :retry_safe
       base.retry_safe = false
 
-      base.superclass_delegating_accessor :open_timeout
+      # Deprecated in Rails 4.2
+      # base.superclass_delegating_accessor :open_timeout
+      base.class_attribute :open_timeout
       base.open_timeout = 60
 
-      base.superclass_delegating_accessor :read_timeout
+      # Deprecated in Rails 4.2
+      # base.superclass_delegating_accessor :read_timeout
+      base.class_attribute :read_timeout
       base.read_timeout = 60
       
-      base.superclass_delegating_accessor :logger
-      base.superclass_delegating_accessor :wiredump_device
+      # Deprecated in Rails 4.2
+      # base.superclass_delegating_accessor :logger
+      base.class_attribute :logger
+      # Deprecated in Rails 4.2
+      # base.superclass_delegating_accessor :wiredump_device
+      base.class_attribute :wiredump_device
     end
     
     def ssl_get(endpoint, headers={})
